@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Term Waste Analyzer | Everyday Playground</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="../assets/js/nav.js" defer></script>
+  <script src="../assets/js/search-term-analyzer.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav container" aria-label="Main navigation">
+      <a class="brand" href="../index.html">Everyday Playground</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+        <span class="sr-only">Open navigation</span>
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="nav-menu">
+        <a data-nav="home" href="../index.html">Home</a>
+        <a data-nav="calculators" href="index.html">Calculators</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container page-main" data-page="calculators">
+    <div class="page-heading">
+      <p class="eyebrow">Google Ads Tools</p>
+      <h1>Search Term Waste Analyzer</h1>
+      <p>
+        Upload a Google Ads search terms CSV, apply performance thresholds, and identify
+        search terms that warrant negative keyword or targeting review.
+      </p>
+    </div>
+
+    <div class="splitter-layout analyzer-layout">
+      <aside class="panel setup-panel" aria-label="Analysis settings">
+        <section>
+          <h2>1. Upload Report</h2>
+          <label for="csv-file">Search terms CSV export</label>
+          <input id="csv-file" type="file" accept=".csv,text/csv">
+          <p class="helper-text">
+            Required columns: <strong>Search term</strong>, <strong>Cost</strong>,
+            <strong>Clicks</strong>, and <strong>Conversions</strong>.
+            Include <strong>Keyword</strong> and <strong>Match type</strong> for targeting context.
+            Include <strong>Conv. value</strong> to analyze ROAS.
+          </p>
+          <p class="helper-text" id="file-message" aria-live="polite">No file imported.</p>
+        </section>
+
+        <hr>
+
+        <section>
+          <h2>2. Set Your KPI Rules</h2>
+          <form id="kpi-form" class="item-form">
+            <fieldset class="kpi-selector">
+              <legend>Primary KPI</legend>
+
+              <div class="kpi-toggle-group" aria-label="Primary KPI">
+                <label class="kpi-toggle">
+                  <input type="radio" name="kpi-goal" value="cpa" checked>
+                  <span>CPA</span>
+                </label>
+
+                <label class="kpi-toggle">
+                  <input type="radio" name="kpi-goal" value="roas">
+                  <span>ROAS</span>
+                </label>
+
+                <label class="kpi-toggle">
+                  <input type="radio" name="kpi-goal" value="both">
+                  <span>Both</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div id="cpa-setting">
+              <label for="target-cpa">Target CPA ($)</label>
+              <input id="target-cpa" type="number" min="0.01" step="0.01" value="30.00">
+            </div>
+
+            <div id="roas-setting" hidden>
+              <label for="target-roas">Target ROAS</label>
+              <input id="target-roas" type="number" min="0.01" step="0.01" value="3.00">
+            </div>
+
+            <div>
+              <label for="zero-conv-spend">Flag no-conversion spend over ($)</label>
+              <input id="zero-conv-spend" type="number" min="0" step="0.01" value="25.00">
+            </div>
+
+            <div>
+              <label for="zero-conv-clicks">Flag no-conversion clicks over</label>
+              <input id="zero-conv-clicks" type="number" min="0" step="1" value="10">
+            </div>
+
+            <button class="button primary full" type="submit">Analyze Search Terms</button>
+          </form>
+        </section>
+      </aside>
+
+      <section class="panel receipt-panel analyzer-results" aria-label="Search term results">
+        <div class="receipt-toolbar">
+          <div>
+            <h2>Review Candidates</h2>
+            <p id="analysis-message">
+              Upload a report and set thresholds to identify potential wasted spend.
+            </p>
+          </div>
+          <button class="button outline" id="export-button" type="button" disabled>
+            Export Flagged CSV
+          </button>
+        </div>
+
+        <div class="summary-grid" aria-label="Analysis summary">
+          <article class="metric-card">
+            <span>Total Spend</span>
+            <strong id="total-spend">$0.00</strong>
+          </article>
+          <article class="metric-card">
+            <span>Flagged Spend</span>
+            <strong id="flagged-spend">$0.00</strong>
+          </article>
+          <article class="metric-card">
+            <span>Flagged Terms</span>
+            <strong id="flagged-count">0</strong>
+          </article>
+          <article class="metric-card">
+            <span>Spend Flagged</span>
+            <strong id="flagged-rate">0.0%</strong>
+          </article>
+        </div>
+
+        <div class="results-controls">
+          <label for="reason-filter">Filter results</label>
+          <select id="reason-filter">
+            <option value="all">All flagged terms</option>
+            <option value="zero-conversions">No conversions</option>
+            <option value="high-cpa">CPA above target</option>
+            <option value="low-roas">ROAS below target</option>
+            <option value="low-alignment">Low keyword alignment</option>
+          </select>
+        </div>
+
+        <div class="table-scroll">
+          <table class="receipt-table analyzer-table">
+            <thead>
+              <tr>
+                <th scope="col">Search Term</th>
+                <th scope="col">Keyword</th>
+                <th scope="col">Match Type</th>
+                <th scope="col">Keyword Alignment</th>
+                <th scope="col">Campaign</th>
+                <th scope="col">Clicks</th>
+                <th scope="col">Cost</th>
+                <th scope="col">Conv.</th>
+                <th scope="col">CPA</th>
+                <th scope="col">ROAS</th>
+                <th scope="col">Reason Flagged</th>
+                <th scope="col">Review Action</th>
+              </tr>
+            </thead>
+            <tbody id="results-body">
+              <tr>
+                <td colspan="12" class="empty-results">No analysis has been run yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="explanation analyzer-note">
+          <h2>About Keyword Alignment</h2>
+          <p>
+            Keyword Alignment compares the words in the search term with the words in the matched
+            keyword. It is a directional review signal only. It does not understand intent,
+            synonyms, close variants, landing-page relevance, or conversion quality, and it does
+            not affect flagged spend unless the term already fails a KPI rule.
+          </p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">Everyday Playground</div>
+  </footer>
+</body>
+</html>

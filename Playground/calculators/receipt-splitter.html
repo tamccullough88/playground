@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt Splitter | Everyday Playground</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="../assets/js/nav.js" defer></script>
+  <script src="../assets/js/receipt-splitter.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav container" aria-label="Main navigation">
+      <a class="brand" href="../index.html">Everyday Playground</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+        <span class="sr-only">Open navigation</span>
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="nav-menu">
+        <a data-nav="home" href="../index.html">Home</a>
+        <a data-nav="calculators" href="index.html">Calculators</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container page-main" data-page="calculators">
+    <div class="page-heading receipt-heading">
+      <p class="eyebrow">Calculators</p>
+      <h1>Receipt Splitter</h1>
+      <p>Add people and items, then select who ordered or shared each item. Shared items divide evenly.</p>
+    </div>
+
+    <div class="splitter-layout">
+      <aside class="panel setup-panel" aria-label="Receipt setup">
+        <section>
+          <h2>Add People</h2>
+          <form id="person-form" class="entry-form">
+            <label class="sr-only" for="person-name">Person name</label>
+            <input id="person-name" type="text" maxlength="30" placeholder="Name" autocomplete="off" required>
+            <button class="button primary compact" type="submit">Add</button>
+          </form>
+          <p class="helper-text">Names become checkbox columns in the receipt.</p>
+          <div class="chips" id="person-chips" aria-live="polite"></div>
+        </section>
+
+        <hr>
+
+        <section>
+          <h2>Add Items</h2>
+          <form id="item-form" class="item-form">
+            <div>
+              <label for="item-name">Item</label>
+              <input id="item-name" type="text" maxlength="50" placeholder="Shared appetizer" autocomplete="off" required>
+            </div>
+            <div>
+              <label for="item-price">Price</label>
+              <input id="item-price" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+            </div>
+            <button class="button primary" type="submit">Add Item</button>
+          </form>
+        </section>
+
+        <button class="button outline danger full reset-button" id="reset-button" type="button">Reset Receipt</button>
+      </aside>
+
+      <section class="panel receipt-panel" aria-label="Receipt assignments and totals">
+        <div class="receipt-toolbar">
+          <div>
+            <h2>Your Receipt</h2>
+            <p id="assignment-message">Add people and items to begin splitting.</p>
+          </div>
+          <div class="receipt-subtotal">
+            <span>Subtotal</span>
+            <strong id="subtotal">$0.00</strong>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="receipt-table">
+            <thead id="receipt-head"></thead>
+            <tbody id="receipt-body"></tbody>
+            <tfoot id="receipt-foot"></tfoot>
+          </table>
+        </div>
+
+        <div id="empty-state" class="empty-state">
+          <strong>No items yet</strong>
+          <p>Add the names at your table, then begin entering receipt items.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="explanation panel">
+      <h2>How shared item totals work</h2>
+      <p>
+        When two or more names are checked for one item, that item is divided between only those people.
+        For amounts that do not divide into exact cents, any remaining pennies are assigned one at a time
+        so the per-person totals always add up to the receipt subtotal.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">Everyday Playground</div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everyday Playground | Calculators</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="../assets/js/nav.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav container" aria-label="Main navigation">
+      <a class="brand" href="../index.html">Everyday Playground</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+        <span class="sr-only">Open navigation</span><span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="nav-menu">
+        <a data-nav="home" href="../index.html">Home</a>
+        <a data-nav="calculators" href="index.html">Calculators</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container page-main" data-page="calculators">
+    <div class="page-heading">
+      <p class="eyebrow">Toolbox</p>
+      <h1>Calculators</h1>
+      <p>Choose a practical calculator below. Each tool has its own page and JavaScript file, so the playground can expand cleanly.</p>
+    </div>
+
+    <section class="tool-grid calculator-library" aria-label="Available calculators">
+      <article class="tool-card large">
+        <div class="tool-icon" aria-hidden="true">÷</div>
+        <div>
+          <h2>Receipt Splitter</h2>
+          <p>Add diners and receipt items, then check off who shared each item. The cost is divided evenly across checked names.</p>
+          <a class="button primary" href="receipt-splitter.html">Open Receipt Splitter</a>
+        </div>
+      </article>
+
+      <article class="tool-card large">
+        <div class="tool-icon ads-icon" aria-hidden="true">$</div>
+        <div>
+          <h2>Search Term Waste Analyzer</h2>
+          <p>Import a Google Ads Search terms CSV and flag review candidates against CPA, ROAS, spend, and click thresholds.</p>
+          <a class="button primary" href="search-term-analyzer.html">Open Search Term Analyzer</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container">Everyday Playground</div></footer>
+</body>
+</html>
