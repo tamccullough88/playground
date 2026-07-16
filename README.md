@@ -213,3 +213,7 @@ At this time, outside submissions for new calculators are not being requested.
 ## Notes
 
 This project is meant to be simple, practical, and easy to understand. The tools are intentionally built with vanilla JavaScript so they can be edited without a complex setup.
+
+## Notes
+
+This project is meant to be simple, practical, and easy to understand. The tools are intentionally built with vanilla JavaScript so they can be edited without a complex setup.
