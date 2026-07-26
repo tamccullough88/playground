@@ -1096,3 +1096,28 @@ label:not(.check-label) {
     align-items: stretch;
   }
 }
+.receipt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.receipt-actions .button {
+  min-height: 40px;
+  padding: 0 13px;
+  font-size: 0.88rem;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .receipt-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
