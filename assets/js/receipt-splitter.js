@@ -17,7 +17,9 @@
     receiptFoot: document.querySelector("#receipt-foot"),
     emptyState: document.querySelector("#empty-state"),
     subtotal: document.querySelector("#subtotal"),
-    assignmentMessage: document.querySelector("#assignment-message")
+    assignmentMessage: document.querySelector("#assignment-message"),
+    copySplitButton: document.querySelector("#copy-split-button"),
+    downloadSplitButton: document.querySelector("#download-split-button"),
   };
 
   const currency = new Intl.NumberFormat("en-US", {
@@ -124,6 +126,145 @@
     return { totals, unassignedCount };
   }
 
+  function calculateItemSplits() {
+  return state.items.map((item) => {
+    const assignedPeople = state.people.filter((person) => item.assignedTo.has(person.id));
+    const splits = Object.fromEntries(state.people.map((person) => [person.id, 0]));
+
+    if (!assignedPeople.length) {
+      return {
+        itemName: item.name,
+        itemTotal: item.cents,
+        assignedPeople: [],
+        splits
+      };
+    }
+
+    const baseShare = Math.floor(item.cents / assignedPeople.length);
+    const remainder = item.cents % assignedPeople.length;
+
+    assignedPeople.forEach((person, index) => {
+      splits[person.id] = baseShare + (index < remainder ? 1 : 0);
+    });
+
+    return {
+      itemName: item.name,
+      itemTotal: item.cents,
+      assignedPeople,
+      splits
+    };
+  });
+}
+
+function buildSplitTableRows() {
+  const itemSplits = calculateItemSplits();
+  const { totals } = calculateTotals();
+
+  const headers = [
+    "Item",
+    "Item Total",
+    ...state.people.map((person) => person.name)
+  ];
+
+  const rows = itemSplits.map((item) => [
+    item.itemName,
+    formatCents(item.itemTotal),
+    ...state.people.map((person) => {
+      const splitAmount = item.splits[person.id];
+      return splitAmount > 0 ? formatCents(splitAmount) : "";
+    })
+  ]);
+
+  rows.push([
+    "Total",
+    formatCents(subtotalCents()),
+    ...state.people.map((person) => formatCents(totals[person.id]))
+  ]);
+
+  return [headers, ...rows];
+}
+
+function getColumnWidths(rows) {
+  const columnCount = Math.max(...rows.map((row) => row.length));
+
+  return Array.from({ length: columnCount }, (_, columnIndex) => {
+    return Math.max(
+      ...rows.map((row) => String(row[columnIndex] ?? "").length)
+    );
+  });
+}
+
+function padCell(value, width, alignRight = false) {
+  const stringValue = String(value ?? "");
+  const padding = " ".repeat(Math.max(width - stringValue.length, 0));
+
+  return alignRight ? `${padding}${stringValue}` : `${stringValue}${padding}`;
+}
+
+function tableRowsToClipboardText(rows) {
+  if (!rows.length) return "";
+
+  const widths = getColumnWidths(rows);
+  const headers = rows[0];
+  const bodyRows = rows.slice(1);
+
+  const rightAlignedColumns = new Set(
+    headers
+      .map((header, index) => index > 0 ? index : null)
+      .filter((index) => index !== null)
+  );
+
+  const formatRow = (row) => {
+    return `| ${row.map((cell, index) => {
+      return padCell(cell, widths[index], rightAlignedColumns.has(index));
+    }).join(" | ")} |`;
+  };
+
+  return [
+    formatRow(headers),
+    ...bodyRows.map(formatRow)
+  ].join("\n");
+}
+
+function csvCell(value) {
+  const stringValue = String(value ?? "");
+  return `"${stringValue.replace(/"/g, '""')}"`;
+}
+
+function tableRowsToCSV(rows) {
+  return rows.map((row) => row.map(csvCell).join(",")).join("\n");
+}
+
+async function copySplitTable() {
+  if (!state.people.length || !state.items.length) return;
+
+  const rows = buildSplitTableRows();
+  const clipboardText = tableRowsToClipboardText(rows);
+
+  try {
+    await navigator.clipboard.writeText(clipboardText);
+    elements.assignmentMessage.textContent = "Split table copied as a formatted table.";
+  } catch {
+    elements.assignmentMessage.textContent = "Copy failed. Try downloading the CSV instead.";
+  }
+}
+
+function downloadSplitCSV() {
+  if (!state.people.length || !state.items.length) return;
+
+  const rows = buildSplitTableRows();
+  const csv = tableRowsToCSV(rows);
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "receipt-split.csv";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
   function renderPeople() {
     elements.personChips.innerHTML = state.people.map((person) => `
       <span class="chip">
@@ -207,6 +348,7 @@
 
   function renderStatus() {
     const { unassignedCount } = calculateTotals();
+    const canExport = state.people.length > 0 && state.items.length > 0;
 
     if (!state.people.length && !state.items.length) {
       elements.assignmentMessage.textContent = "Add people and items to begin splitting.";
@@ -220,6 +362,8 @@
     } else {
       elements.assignmentMessage.textContent = "Add receipt items to start calculating totals.";
     }
+      elements.copySplitButton.disabled = !canExport;
+      elements.downloadSplitButton.disabled = !canExport;
   }
 
   function render() {
@@ -271,6 +415,8 @@
     state.items = [];
     render();
   });
+  elements.copySplitButton.addEventListener("click", copySplitTable);
+  elements.downloadSplitButton.addEventListener("click", downloadSplitCSV);
 
   render();
 })();
